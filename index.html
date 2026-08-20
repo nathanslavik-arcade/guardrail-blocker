@@ -106,7 +106,7 @@ const CFG = {
   lives:   3,
   shieldUp: 48,       // auto-governance shield height above the paddle
   greenChance: .45,   // share of spawns that are good (green) agents
-  greenPenalty: 25,   // points lost for blocking a green agent
+  greenPenalty: 15,   // points lost for blocking a green agent
 };
 
 /* ────────────────────────── state ────────────────────────── */
@@ -645,16 +645,14 @@ function drawTitle() {
   const sample = (x, y, sp, ph) =>
     drawCreature({ x, y, r: 13, sp, ph, squash: 1, blink: 1, vx: 0 });
 
-  sample(92, 380, GREENS[0], t * 3);
-  text("GREEN AGENTS - LET THEM THROUGH", 118, 376, { size: 12, color: "#6ef2a0" });
-  text("+15 when one reaches your systems", 118, 392, { size: 10, color: "rgba(110,242,160,.65)" });
+  sample(92, 386, GREENS[0], t * 3);
+  text("GREEN AGENTS - LET THEM THROUGH", 118, 372, { size: 12, color: "#6ef2a0" });
+  text("+15 when one reaches your systems", 118, 388, { size: 10, color: "rgba(110,242,160,.65)" });
+  text("-" + CFG.greenPenalty + " when you wrongly block", 118, 404, { size: 10, color: "rgba(255,160,180,.75)" });
 
-  sample(92, 438, REDS[0], t * 3 + 1.7);
-  text("RED AGENTS - BLOCK THEM", 118, 434, { size: 12, color: "#ff4d5e" });
-  text("+10 blocked / -1 life if one gets through", 118, 450, { size: 10, color: "rgba(255,130,150,.7)" });
-
-  text("BLOCKING A GREEN AGENT COSTS " + CFG.greenPenalty + " POINTS", W / 2, 482,
-       { size: 10, color: "rgba(205,210,240,.6)", align: "center" });
+  sample(92, 446, REDS[0], t * 3 + 1.7);
+  text("RED AGENTS - BLOCK THEM", 118, 440, { size: 12, color: "#ff4d5e" });
+  text("+10 blocked / -1 life if one gets through", 118, 456, { size: 10, color: "rgba(255,130,150,.7)" });
 
   text("ARROW KEYS  or  A / D  - MOVE BLOCKER", W / 2, 520, { size: 13, color: "#cfd8ff", align: "center" });
   text("MOUSE / TOUCH ALSO WORKS      P - PAUSE", W / 2, 540, { size: 11, color: "rgba(180,190,255,.7)", align: "center" });
