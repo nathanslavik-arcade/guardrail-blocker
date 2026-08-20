@@ -552,7 +552,8 @@ function drawLogo(g) {
   ctx.fillRect(-7, 5, 14, 3);
 
   ctx.restore();
-  text("ARCADE", g.x, g.y + 38, { size: 11, color: "#ffd0a0", align: "center", glow: 8 });
+  text("ARCADE GOVERNANCE", clamp(g.x, 56, W - 56), g.y + 38,
+       { size: 10, color: "#ffd0a0", align: "center", glow: 8 });
 }
 
 function drawShield() {
@@ -586,7 +587,9 @@ function drawPaddle() {
   g.addColorStop(0, "#eafcff"); g.addColorStop(.35, "#4fd1ff"); g.addColorStop(1, "#1560a8");
   ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
   ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.fillRect(x, y, w, 3);
-  ctx.fillStyle = "#0d2b4d"; ctx.fillRect(x + 6, y + 6, w - 12, 4);
+  ctx.fillStyle = "rgba(8,32,58,.5)"; ctx.fillRect(x + 4, y + 5, w - 8, 8);
+  text("GUARDRAILS", x + w / 2, y + 12,
+       { size: 9, color: "#eafcff", align: "center" });
   /* end caps */
   ctx.fillStyle = "#ff8a3d";
   ctx.fillRect(x - 4, y + 2, 4, h - 4);
