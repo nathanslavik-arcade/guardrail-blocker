@@ -1,4 +1,4 @@
-# Arcade Governance
+# Guardrail Blocker
 
 A classic-arcade browser game. A model spits out agents; you run the blocker.
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>ARCADE GOVERNANCE</title>
+<title>GUARDRAIL BLOCKER</title>
 <style>
   :root { --bezel:#15121f; --glow:#4fd1ff; }
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -39,7 +39,7 @@
 </head>
 <body>
 <div id="cabinet">
-  <div id="marquee">Arcade Governance</div>
+  <div id="marquee">Guardrail Blocker</div>
   <div id="wrap"><canvas id="game" width="480" height="720"></canvas></div>
 </div>
 <script>
@@ -635,8 +635,8 @@ function overlay(alpha = .74) {
 function drawTitle() {
   overlay(.66);
   const bob = Math.sin(t * 2) * 4;
-  text("ARCADE", W / 2, 190 + bob, { size: 58, color: "#ff8a3d", align: "center", glow: 26 });
-  text("GOVERNANCE", W / 2, 240 + bob, { size: 44, color: "#4fd1ff", align: "center", glow: 26 });
+  text("GUARDRAIL", W / 2, 190 + bob, { size: 56, color: "#ff8a3d", align: "center", glow: 26 });
+  text("BLOCKER", W / 2, 244 + bob, { size: 56, color: "#4fd1ff", align: "center", glow: 26 });
 
   text("Don't let the model spit out a bad agent", W / 2, 300, { size: 13, color: "#cfd8ff", align: "center" });
   text("that reaches your business systems.", W / 2, 320, { size: 13, color: "#cfd8ff", align: "center" });
