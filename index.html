@@ -303,12 +303,45 @@ const speedMult  = () => Math.min(CFG.fall.max, 1 + handled * CFG.fall.perBlock)
 const spawnEvery = () => Math.max(CFG.spawn.min, CFG.spawn.base - handled * CFG.spawn.perBlock);
 const shieldY    = () => CFG.paddle.y - CFG.shieldUp;
 
+/* ────────────────────────── quit dialog ──────────────────── */
+/* A quick tap or click on the field (no drag) asks to quit. Drags still steer. */
+const TAP = { ms: 250, px: 10 };
+const QUIT_Y = { x: W / 2 - 96, y: H / 2 + 6, w: 84, h: 46 };
+const QUIT_N = { x: W / 2 + 12, y: H / 2 + 6, w: 84, h: 46 };
+const inBox = (p, b) => p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h;
+let tapStart = null;
+function askQuit() { state = "quit"; keys = Object.create(null); tone(330, .08, { vol: .05 }); }
+function resumeFromQuit() { state = "playing"; last = performance.now(); }
+function quitKey(e) {
+  const k = e.key.toLowerCase();
+  if (k === "y") { quitToTitle(); return true; }
+  if (k === "n" || k === "escape") { resumeFromQuit(); return true; }
+  return true;   // swallow everything else while the dialog is up
+}
+function quitTap(p) {
+  if (inBox(p, QUIT_Y)) quitToTitle();
+  else if (inBox(p, QUIT_N)) resumeFromQuit();
+}
+function drawQuit() {
+  overlay(.7);
+  text("QUIT?", W / 2, H / 2 - 40, { size: 44, color: "#fff", align: "center", glow: 16 });
+  for (const [b, label, c] of [[QUIT_Y, "Y", "#ff4d5e"], [QUIT_N, "N", "#6ef2a0"]]) {
+    ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.strokeRect(b.x + .5, b.y + .5, b.w - 1, b.h - 1);
+    text(label, b.x + b.w / 2, b.y + 33, { size: 26, color: c, align: "center", glow: 10 });
+  }
+  text("Y  QUIT TO TITLE      N  KEEP PLAYING", W / 2, H / 2 + 84, { size: 11, color: "rgba(200,205,255,.75)", align: "center" });
+}
+function quitToTitle() { reset(); state = "title"; }
+
 /* ────────────────────────── input ────────────────────────── */
 function startGame() { reset(); state = "playing"; sfx.start(); lb.start(); }
 
 addEventListener("keydown", e => {
   audio();
   if (state === "gameover" && lb.key(e)) return;
+  if (state === "quit") { quitKey(e); e.preventDefault(); return; }
+  if (e.key === "Escape" && state === "playing") { askQuit(); return; }
   if (["ArrowLeft", "ArrowRight", " ", "ArrowUp", "ArrowDown"].includes(e.key)) e.preventDefault();
   keys[e.key.toLowerCase()] = true;
   if (e.key === " " || e.key === "Enter") {
@@ -325,9 +358,21 @@ function toCanvasX(clientX) {
   return clamp((clientX - r.left) / r.width * W, 0, W);
 }
 cv.addEventListener("pointermove", e => { pointerX = toCanvasX(e.clientX); });
-cv.addEventListener("pointerleave", () => { pointerX = null; });
+cv.addEventListener("pointerleave", () => { pointerX = null; tapStart = null; });
+cv.addEventListener("pointerup", e => {
+  const s = tapStart; tapStart = null;
+  if (!s || state !== "playing") return;
+  if (performance.now() - s.t < TAP.ms && Math.hypot(e.clientX - s.x, e.clientY - s.y) < TAP.px) askQuit();
+});
+function toCanvas(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+}
 cv.addEventListener("pointerdown", e => {
-  audio(); pointerX = toCanvasX(e.clientX);
+  audio();
+  if (state === "quit") { quitTap(toCanvas(e)); return; }
+  pointerX = toCanvasX(e.clientX);
+  tapStart = state === "playing" ? { x: e.clientX, y: e.clientY, t: performance.now() } : null;
   if (state === "gameover") {
     const r = cv.getBoundingClientRect();
     if (lb.tap(pointerX, (e.clientY - r.top) / r.height * H)) return;
@@ -832,7 +877,7 @@ function drawTitle() {
   text("+10 blocked / -1 life if one gets through", 118, 456, { size: 10, color: "rgba(255,130,150,.7)" });
 
   text("ARROW KEYS  or  A / D  - MOVE BLOCKER", W / 2, 520, { size: 13, color: "#cfd8ff", align: "center" });
-  text("MOUSE / TOUCH ALSO WORKS      P - PAUSE", W / 2, 540, { size: 11, color: "rgba(180,190,255,.7)", align: "center" });
+  text("MOUSE / TOUCH ALSO WORKS   P PAUSE   TAP QUIT", W / 2, 540, { size: 11, color: "rgba(180,190,255,.7)", align: "center" });
 
   text("CATCH THE ARCADE LOGO - " + CFG.logo.duration + "s AUTO-GOVERNANCE", W / 2, 578,
        { size: 11, color: "#ffd23f", align: "center", glow: 8 });
@@ -892,6 +937,7 @@ function render() {
 
   if (state === "title") drawTitle();
   if (state === "gameover") drawGameOver();
+  if (state === "quit") drawQuit();
   if (state === "paused") {
     overlay(.6);
     text("PAUSED", W / 2, H / 2, { size: 40, color: "#fff", align: "center", glow: 16 });

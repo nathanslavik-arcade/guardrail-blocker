@@ -12,7 +12,7 @@ A classic-arcade browser game. A model spits out agents; you run the blocker.
 
 Agents fall faster and more often the more you handle correctly. Three lives.
 
-Arrow keys or A/D to move, mouse and touch also work, P to pause.
+Arrow keys or A/D to move, mouse and touch also work, P to pause. Tap the field (or press Esc) to quit to the title screen.
 
 Single self-contained HTML file — no dependencies, no build step. Open
 `index.html` directly and it plays offline.
