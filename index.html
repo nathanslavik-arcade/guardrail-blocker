@@ -337,12 +337,22 @@ function drawQuit() {
 const ARCADE_URL = "../arcade-arcade/#games";
 function quitToArcade() { location.href = ARCADE_URL; }
 
+/* Under the high score board: Space retries, X (or tapping the exit line) goes back to the arcade */
+const EXIT_LINE = { x: 0, y: 682, w: W, h: 38 };
+function drawRetryExit() {
+  if (lb.busy) return;
+  if (Math.sin(t * 4) > -.3)
+    text("PRESS SPACE TO RETRY", W / 2, 664, { size: 17, color: "#fff", align: "center", glow: 12 });
+  text("PRESS X TO EXIT", W / 2, 698, { size: 14, color: "#ff8fa3", align: "center" });
+}
+
 /* ────────────────────────── input ────────────────────────── */
 function startGame() { reset(); state = "playing"; sfx.start(); lb.start(); }
 
 addEventListener("keydown", e => {
   audio();
   if (state === "gameover" && lb.key(e)) return;
+  if (state === "gameover" && e.key.toLowerCase() === "x") { quitToArcade(); return; }
   if (state === "quit") { quitKey(e); e.preventDefault(); return; }
   if (e.key === "Escape" && state === "playing") { askQuit(); return; }
   if (["ArrowLeft", "ArrowRight", " ", "ArrowUp", "ArrowDown"].includes(e.key)) e.preventDefault();
@@ -378,7 +388,9 @@ cv.addEventListener("pointerdown", e => {
   tapStart = state === "playing" ? { x: e.clientX, y: e.clientY, t: performance.now() } : null;
   if (state === "gameover") {
     const r = cv.getBoundingClientRect();
-    if (lb.tap(pointerX, (e.clientY - r.top) / r.height * H)) return;
+    const y = (e.clientY - r.top) / r.height * H;
+    if (lb.tap(pointerX, y)) return;
+    if (inBox({ x: pointerX, y }, EXIT_LINE)) { quitToArcade(); return; }
   }
   if (state === "title" || state === "gameover") startGame();
   else if (state === "paused") state = "playing";
@@ -900,8 +912,7 @@ function drawGameOver() {
   text("GOOD AGENTS PASSED  " + passed, W / 2, 224, { size: 13, color: "#6ef2a0", align: "center" });
   text("LEVEL REACHED  " + level, W / 2, 244, { size: 13, color: "#4fd1ff", align: "center" });
   lb.draw(282);
-  if (!lb.busy && Math.sin(t * 4) > -.3)
-    text("PRESS SPACE TO RETRY", W / 2, 680, { size: 18, color: "#fff", align: "center", glow: 12 });
+  drawRetryExit();
 }
 
 function render() {
